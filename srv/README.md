@@ -7,8 +7,6 @@ POC srv
 - webservice support with middleware architecture
 - redis cache support
 - golang implementation with modules
-- kubernetes support (service, pods with autoscaling, secrets, config)
-- database SQL migration scripts support
 
 ### More technical features:
 
@@ -26,10 +24,7 @@ Check Makefiles for all important stuff.
 
 - [./cmd/srv](./cmd/srv) - server implementation
 - [./internal](./internal) - internal packages that should not be shared with other projects
-- [./db](./db/README.md) - database migration scripts
 - [./template](./template/README.md) - html templates
-- [./static](./static) - static files
-- [./k8s](./k8s) - kubernetes kustomize files
 
 ## Requirements
 
