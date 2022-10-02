@@ -1,0 +1,56 @@
+openapi: 3.0.3
+
+info:
+  title: "SRV API"
+  version: 0.1.0
+  description: Srv API.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: {{.SrvUrl}}
+    description: API server
+
+tags:
+  - name: infra
+    description: Service tag
+
+paths:
+    /health:
+      get:
+        tags:
+          - infra
+        summary: Healthcheck
+        operationId: getHealth
+        description: Healthcheck
+        responses:
+          200:
+            description: OK
+          429:
+            $ref: '#/components/responses/TooManyRequests'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: The API Key
+      in: header
+      name: api-key
+  schemas: {}
+  responses:
+    Unauthorized:
+      description: API key is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+    TooManyRequests:
+      description: API has been called too many times in the last throttle period
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+
+security:
+  - ApiKeyAuth: []

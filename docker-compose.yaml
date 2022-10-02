@@ -1,0 +1,158 @@
+version: "3.9"
+
+services:
+  db:
+    profiles:
+      - dev
+      - int-test
+    image: postgres:14-bullseye
+    command: -c ssl=off
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-diatom-dev}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-diatom-dev}
+      POSTGRES_DB: ${DB_NAME:-diatom-dev}
+    ports:
+      - "5432:5432"
+#    volumes:
+#      - ./db.sql:/docker-entrypoint-initdb.d/0-db.sql
+
+#  db-setup:
+#    profiles:
+#      - dev
+#      - int-test
+#    image: postgres
+#    command: psql --dbname=${DB_NAME:-diatom-dev} --username=${DB_USERNAME:-diatom-dev} --host=${DB_HOST:-db} -f /db-dev.sql
+#    restart: on-failure
+#    environment:
+#      - PGPASSWORD=${DB_PASSWORD:-diatom-dev}
+#    volumes:
+#      - ./db-data-dev.sql:srv/db-dev.sql
+#    depends_on:
+#      - db
+
+  redis:
+    profiles:
+      - dev
+    image: redis:7-bullseye
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/redis-data
+
+  proxy-dev:
+    profiles:
+      - dev
+    image: "traefik:v2.9"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true" # Don't do that in production
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web-secure.address=:443"
+    restart: always
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+#  proxy:
+#    profiles:
+#      - prod
+#    image: "traefik:v2.6"
+#    restart: always
+#    command:
+#      # - "--log.level=DEBUG"
+#      # - "--api.insecure=true" # Don't do that in production
+#      - "--providers.docker=true"
+#      - "--providers.docker.exposedbydefault=false"
+#      - "--entrypoints.web.address=:80"
+#      - "--entrypoints.web-secure.address=:443"
+#      - "--certificatesresolvers.tls-resolver.acme.email= ${ACME_EMAIL:-kontakt@flowlab.no}"
+#      - "--certificatesresolvers.tls-resolver.acme.dnschallenge.provider=linode"
+#      - "--certificatesresolvers.tls-resolver.acme.dnschallenge.delaybeforecheck=0"
+#      - "--certificatesresolvers.tls-resolver.acme.storage=/letsencrypt/acme.json"
+#    environment:
+#      LINODE_TOKEN: ${LINODE_TOKEN}
+#    ports:
+#      # - "80:80"
+#      # - "8080:8080"
+#      - "443:443"
+#    volumes:
+#      - "./letsencrypt:/letsencrypt"
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  backend:
+    profiles:
+      - dev
+      - int-test
+      - prod
+    restart: always
+    build:
+      context: srv/
+      dockerfile: Dockerfile
+      args:
+        - GIT_SHA=${GIT_SHA:-dev}
+        - VERSION=${VERSION:-dev}
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: ${PORT:-8000}
+      DB_HOST: ${DB_HOST:-db}
+      DB_NAME: ${DB_NAME:-diatom-dev}
+      DB_USERNAME: ${DB_USERNAME:-diatom-dev}
+      DB_PASSWORD: ${DB_PASSWORD:-diatom-dev}
+      DB_PORT: ${DB_PORT:-5432}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+
+      - "traefik.http.routers.backend-http.rule=PathPrefix(`/backend/api`)"
+      - "traefik.http.middlewares.stripprefix-backend-http.stripprefix.prefixes=/backend/api"
+      - "traefik.http.routers.backend-http.middlewares=stripprefix-backend-http@docker"
+      - "traefik.http.routers.backend-http.entrypoints=web"
+
+      - "traefik.http.routers.backend-https.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/backend/api`)"
+      - "traefik.http.middlewares.stripprefix-backend-https.stripprefix.prefixes=/backend/api"
+      - "traefik.http.routers.backend-https.middlewares=stripprefix-backend-https@docker"
+      - "traefik.http.routers.backend-https.tls=true"
+      - "traefik.http.routers.backend-https.entrypoints=web-secure"
+      - "traefik.http.routers.backend-https.tls.certresolver=tls-resolver"
+
+#  frontend:
+#    profiles:
+#      - dev
+#    restart: always
+#    mem_limit: 256m
+#    mem_reservation: 32M
+#    cpus: 1
+#    build:
+#      context: ../diatom-frontend
+#      dockerfile: ../diatom-frontend/Dockerfile
+#      args:
+#        REACT_APP_BACKEND_URI: ${REACT_APP_BACKEND_URI:-/backend/api}
+#        REACT_APP_KEYCLOAK_URI: ${REACT_APP_KEYCLOAK_URI:-/auth}
+#        REACT_APP_KEYCLOAK_CLIENT_ID: ${REACT_APP_KEYCLOAK_CLIENT_ID:-diatom-dev}
+#    ports:
+#      - "${FRONTEND_PORT:-3000}"
+#    depends_on:
+#      - backend
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+#      - "traefik.http.routers.frontend-https.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/`) && !PathPrefix(`/auth`) && !PathPrefix(`/backend/api`)"
+#      - "traefik.http.routers.frontend-https.tls=true"
+#      - "traefik.http.routers.frontend-https.entrypoints=web-secure"
+#      - "traefik.http.routers.frontend-https.tls.certresolver=tls-resolver"
+#
