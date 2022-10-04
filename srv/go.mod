@@ -1,4 +1,4 @@
-module github.com/flow-lab/auxospore
+module github.com/flow-lab/diatom-pub
 
 go 1.19
 
@@ -7,6 +7,7 @@ require (
 	github.com/alicebob/miniredis/v2 v2.23.0
 	github.com/go-pg/pg v8.0.7+incompatible
 	github.com/go-redis/redis/v7 v7.4.1
+	github.com/google/uuid v1.3.0
 	github.com/lib/pq v1.10.7
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.0

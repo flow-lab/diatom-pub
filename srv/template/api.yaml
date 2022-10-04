@@ -15,6 +15,8 @@ servers:
 tags:
   - name: infra
     description: Service tag
+  - name: authorization
+    description: Author
 
 paths:
     /health:
@@ -30,6 +32,33 @@ paths:
           429:
             $ref: '#/components/responses/TooManyRequests'
 
+    /authors/{author_id}:
+      get:
+        tags:
+          - author
+        summary: Get author by id
+        operationId: getAuthorById
+        description: Get author by id
+        parameters:
+          - name: author_id
+            in: path
+            description: Author id
+            required: true
+            schema:
+              type: string
+              format: uuid
+        responses:
+          200:
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Author'
+          404:
+            $ref: '#/components/responses/NotFound'
+          429:
+            $ref: '#/components/responses/TooManyRequests'
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -37,20 +66,23 @@ components:
       description: The API Key
       in: header
       name: api-key
-  schemas: {}
+  schemas:
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Delia Owens
   responses:
     Unauthorized:
       description: API key is missing or invalid
-      headers:
-        WWW_Authenticate:
-          schema:
-            type: string
+    NotFound:
+      description: Resource not found
     TooManyRequests:
       description: API has been called too many times in the last throttle period
-      headers:
-        WWW_Authenticate:
-          schema:
-            type: string
 
 security:
   - ApiKeyAuth: []

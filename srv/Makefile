@@ -25,9 +25,13 @@ verify ve: ## Verify dependencies
 	go mod verify
 
 .PHONY: generate g
-generate g: ## Run all code generation
+generate g: api-gen-models ## Run all code generation
 	sqlc generate
 	go generate -run="mockgen" ./...
+
+.PHONY: api-gen-models agm
+api-gen-models: ## Generate models from api
+	./gen-models.sh
 
 .PHONY: test t
 test t: ## Run tests
@@ -38,9 +42,13 @@ dev-watch dw: ## Run the server in dev mode with watch gow, install https://gith
 	# add all files that need to be compiled
 	env PORT=8888 DB_HOST=localhost DB_PORT=5432 DB_NAME=diatom-dev DB_USERNAME=diatom-dev DB_PASSWORD=diatom-dev REDIS_HOST=localhost REDIS_PORT=6379 gow run cmd/srv/main.go cmd/srv/health.go cmd/srv/apidoc.go srv/db/.
 
-api-lint:
-	curl http://localhost/backend/api/api.yaml > api.yaml
-	openapi lint api.yaml
+.PHONY: api-lint al
+api-lint: g ## Lint api using
+	npx @redocly/cli lint .api.yaml
+
+.PHONY: api-preview ap
+api-preview: g ## Lint api using
+	npx @redocly/cli preview-docs .api.yaml
 
 .PHONY: help
 help: ## Show this

@@ -1,4 +1,4 @@
-# auxospore
+# diatom-pub
 
 POC srv
 

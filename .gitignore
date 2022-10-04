@@ -12,3 +12,8 @@
 *.out
 
 .idea
+
+.api.yaml
+
+redis-data
+gen

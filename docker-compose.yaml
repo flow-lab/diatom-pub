@@ -14,22 +14,22 @@ services:
       POSTGRES_DB: ${DB_NAME:-diatom-dev}
     ports:
       - "5432:5432"
-#    volumes:
-#      - ./db.sql:/docker-entrypoint-initdb.d/0-db.sql
+    volumes:
+      - ./srv/db.sql:/docker-entrypoint-initdb.d/0-db.sql
 
-#  db-setup:
-#    profiles:
-#      - dev
-#      - int-test
-#    image: postgres
-#    command: psql --dbname=${DB_NAME:-diatom-dev} --username=${DB_USERNAME:-diatom-dev} --host=${DB_HOST:-db} -f /db-dev.sql
-#    restart: on-failure
-#    environment:
-#      - PGPASSWORD=${DB_PASSWORD:-diatom-dev}
-#    volumes:
-#      - ./db-data-dev.sql:srv/db-dev.sql
-#    depends_on:
-#      - db
+  db-setup:
+    profiles:
+      - dev
+      - int-test
+    image: postgres
+    command: psql --dbname=${DB_NAME:-diatom-dev} --username=${DB_USERNAME:-diatom-dev} --host=${DB_HOST:-db} -f /db-dev.sql
+    restart: on-failure
+    environment:
+      - PGPASSWORD=${DB_PASSWORD:-diatom-dev}
+    volumes:
+      - ./srv/db-dev.sql:/db-dev.sql
+    depends_on:
+      - db
 
   redis:
     profiles:
@@ -142,8 +142,6 @@ services:
 #      dockerfile: ../diatom-frontend/Dockerfile
 #      args:
 #        REACT_APP_BACKEND_URI: ${REACT_APP_BACKEND_URI:-/backend/api}
-#        REACT_APP_KEYCLOAK_URI: ${REACT_APP_KEYCLOAK_URI:-/auth}
-#        REACT_APP_KEYCLOAK_CLIENT_ID: ${REACT_APP_KEYCLOAK_CLIENT_ID:-diatom-dev}
 #    ports:
 #      - "${FRONTEND_PORT:-3000}"
 #    depends_on:

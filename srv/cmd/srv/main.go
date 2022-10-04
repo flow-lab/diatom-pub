@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	"expvar"
 	"fmt"
-	"github.com/flow-lab/auxospore/internal/db"
-	"github.com/flow-lab/auxospore/internal/middleware"
+	"github.com/flow-lab/diatom-pub/internal/db"
+	"github.com/flow-lab/diatom-pub/internal/handler"
+	"github.com/flow-lab/diatom-pub/internal/middleware"
 	"github.com/go-redis/redis/v7"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -27,7 +28,7 @@ var (
 )
 
 func main() {
-	logger := log.New(os.Stdout, fmt.Sprintf("auxospore : (%s, %s) : ", version, short(commit)), log.LstdFlags|log.Lmicroseconds|log.Lshortfile|log.Ldate)
+	logger := log.New(os.Stdout, fmt.Sprintf("diatom-pub : (%s, %s) : ", version, short(commit)), log.LstdFlags|log.Lmicroseconds|log.Lshortfile|log.Ldate)
 	if err := run(logger); err != nil {
 		logger.Printf("error : %s", err)
 		os.Exit(1)
@@ -96,7 +97,7 @@ func run(logger *log.Logger) error {
 	}
 
 	// queries
-	_ = db.New(dbClient)
+	queries := db.New(dbClient)
 
 	// connect to redis
 	redisHost, ok := os.LookupEnv("REDIS_HOST")
@@ -120,6 +121,13 @@ func run(logger *log.Logger) error {
 		)
 		http.HandleFunc("/api.yaml", middleware.Chain(
 			APIDefinition(templateDir, logger),
+			middleware.OnlyMethod("GET"),
+			middleware.Sec(),
+			middleware.CORS(),
+			middleware.Logging(logger)),
+		)
+		http.HandleFunc("/authors/", middleware.Chain(
+			handler.GetAuthor(logger, queries),
 			middleware.OnlyMethod("GET"),
 			middleware.Sec(),
 			middleware.CORS(),

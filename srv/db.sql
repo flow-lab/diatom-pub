@@ -3,7 +3,7 @@ create extension if not exists citext;
 
 CREATE TABLE if not exists authors
 (
-    id BIGSERIAL PRIMARY KEY,
-    name text NOT NULL,
+    id   uuid primary key default uuid_generate_v4(),
+    name text not null,
     bio  text
 );

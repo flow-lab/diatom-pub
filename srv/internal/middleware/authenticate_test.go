@@ -3,7 +3,7 @@ package middleware
 //
 //import (
 //	"context"
-//	"github.com/flow-lab/auxospore/internal/tenant"
+//	"github.com/flow-lab/diatom-pub/internal/tenant"
 //	"github.com/golang/mock/gomock"
 //	"net/http"
 //	"net/http/httptest"
