@@ -17,3 +17,10 @@
 
 redis-data
 gen
+db-data
+letsencrypt
+*.key
+*.crt
+
+# used by docker compose
+.env
