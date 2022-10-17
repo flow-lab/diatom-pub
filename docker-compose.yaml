@@ -6,7 +6,7 @@ services:
       - dev
       - int-test
       - prod 
-    image: postgres:14-bullseye
+    image: postgres:15-bullseye
     command: -c ssl=off
     restart: always
     environment:
