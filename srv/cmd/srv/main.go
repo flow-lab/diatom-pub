@@ -93,11 +93,16 @@ func run(logger *log.Logger) error {
 		logger.Fatal(errors.New("missing required parameter DB_PASSWORD"))
 	}
 
+	dbSSLMode := os.Getenv("DB_SSLMODE")
+
 	// connect to db
-	dbClient, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable", dbHost, dbPort, dbName, dbUsername, dbPassword))
+	dbClient, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", dbHost, dbPort, dbName, dbUsername, dbPassword, dbSSLMode))
 	if err != nil {
 		logger.Fatal(errors.Wrap(err, "sql.Open"))
 	}
+
+	// print db stats
+	logger.Printf("db stats : %+v", dbClient.Stats())
 
 	// queries
 	queries := db.New(dbClient)
@@ -114,6 +119,9 @@ func run(logger *log.Logger) error {
 	redisClient := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%s", redisHost, redisPort),
 	})
+
+	// print redis stats
+	logger.Printf("redis stats : %+v", redisClient.PoolStats())
 
 	ctx := context.Background()
 

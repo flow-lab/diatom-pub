@@ -3,6 +3,9 @@
 Diatom test
 
 ```shell
+# generate db certs
+sudo certs/generate.sh
+
 # build and run in docker
 docker compose --profile dev up --force-recreate --build -d
 # curl http://localhost/backend/api/api.yaml
