@@ -5,12 +5,6 @@ import (
 	"database/sql"
 	"expvar"
 	"fmt"
-	"github.com/flow-lab/diatom-pub/internal/db"
-	"github.com/flow-lab/diatom-pub/internal/handler"
-	"github.com/flow-lab/diatom-pub/internal/middleware"
-	"github.com/go-redis/redis/v7"
-	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -19,6 +13,13 @@ import (
 	"runtime"
 	"syscall"
 	"time"
+
+	"github.com/flow-lab/diatom-pub/internal/db"
+	"github.com/flow-lab/diatom-pub/internal/handler"
+	"github.com/flow-lab/diatom-pub/internal/middleware"
+	"github.com/go-redis/redis/v7"
+	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -91,9 +92,11 @@ func run(logger *log.Logger) error {
 	if !ok {
 		logger.Fatal(errors.New("missing required parameter DB_PASSWORD"))
 	}
+
+	// connect to db
 	dbClient, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable", dbHost, dbPort, dbName, dbUsername, dbPassword))
 	if err != nil {
-		return err
+		logger.Fatal(errors.Wrap(err, "sql.Open"))
 	}
 
 	// queries
@@ -112,11 +115,13 @@ func run(logger *log.Logger) error {
 		Addr: fmt.Sprintf("%s:%s", redisHost, redisPort),
 	})
 
+	ctx := context.Background()
+
 	// start api server
-	go func() {
+	go func(ctx context.Context) {
 		logger.Printf("api server : listening on %s", apiSrv.Addr)
 		http.HandleFunc("/health", middleware.Chain(
-			Health(logger, dbClient, redisClient),
+			Health(ctx, dbClient, redisClient, logger),
 			middleware.OnlyMethod("GET")),
 		)
 		http.HandleFunc("/api.yaml", middleware.Chain(
@@ -134,7 +139,7 @@ func run(logger *log.Logger) error {
 			middleware.Logging(logger)),
 		)
 		serverErrors <- apiSrv.ListenAndServe()
-	}()
+	}(ctx)
 
 	// listen to all signal from os
 	shutdown := make(chan os.Signal, 1)
@@ -146,7 +151,7 @@ func run(logger *log.Logger) error {
 	case sig := <-shutdown:
 		timeout := 5 * time.Second
 		logger.Printf("run : got: %v : Start graceful shutdown with timeout %s", sig, timeout)
-		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+		ctx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
 
 		// Asking listener to shut down and load shed.

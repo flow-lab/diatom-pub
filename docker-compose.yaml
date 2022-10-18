@@ -4,7 +4,6 @@ services:
   db:
     profiles:
       - dev
-      - int-test
       - prod 
     image: postgres:15-bullseye
     command: -c ssl=off
@@ -23,7 +22,6 @@ services:
   db-setup:
     profiles:
       - dev
-      - int-test
     image: postgres
     command: psql --dbname=${DB_NAME:-diatom-dev} --username=${DB_USERNAME:-diatom-dev} --host=${DB_HOST:-db} -f /db-dev.sql
     restart: on-failure
@@ -70,13 +68,13 @@ services:
     image: "traefik:v2.9"
     restart: always
     command:
-      - "--log.level=DEBUG"
-      # - "--api.insecure=true" # Don't do that in production
+      - "--log.level=${PROXY_LOG_LEVEL:-DEBUG}"
+      - "--api.dashboard=${PROXY_DASHBOARD:-false}"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web-secure.address=:443"
-      - "--certificatesresolvers.tls-resolver.acme.email= ${ACME_EMAIL:-kontakt@flowlab.no}"
+      - "--certificatesresolvers.tls-resolver.acme.email=${ACME_EMAIL:-kontakt@flowlab.no}"
       - "--certificatesresolvers.tls-resolver.acme.dnschallenge.provider=route53"
       - "--certificatesresolvers.tls-resolver.acme.dnschallenge.delaybeforecheck=0"
       - "--certificatesresolvers.tls-resolver.acme.storage=/letsencrypt/acme.json"
@@ -85,17 +83,22 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       AWS_HOSTED_ZONE_ID: ${AWS_HOSTED_ZONE_ID:-}
     ports:
-      # - "80:80"
-      # - "8080:8080"
       - "443:443"
     volumes:
       - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`${DOMAIN:-localhost}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=${BASIC_AUTH_USERS:-}"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=tls-resolver"
 
   backend:
     profiles:
       - dev
-      - int-test
       - prod
     restart: always
     build:
@@ -106,7 +109,7 @@ services:
         - VERSION=${VERSION:-dev}
         - GOARCH=${GOARCH:-arm64}
     ports:
-      - "8000:8000"
+      - "${PORT:-8000}"
     environment:
       PORT: ${PORT:-8000}
       DB_HOST: ${DB_HOST:-db}
