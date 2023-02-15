@@ -17,13 +17,13 @@ on:
     branches: [ "main" ]
 
 env:
-  export DEPLOYMENT_NAME=diatom-pub
-  export GAR_LOCATION=europe-west4
-  export GKE_CLUSTER=flow-platform-cluster
-  export GKE_ZONE=europe-west4-a
-  export IMAGE=diatom-pub
-  export PROJECT_ID=$(cat /Users/flowlab/.config/gcloud/flow-platform-deployment.json)
-  export REPOSITORY=diatom-pub
+  DEPLOYMENT_NAME: diatom-pub
+  GAR_LOCATION: eu-west4
+  GKE_CLUSTER: flow-platform-cluster
+  GKE_ZONE: europe-west4-a
+  IMAGE: diatom-pub
+  PROJECT_ID: ${{secrets.GKE_PROJECT}}
+  REPOSITORY: diatom-pub
 
 jobs:
   setup-build-publish-deploy:
@@ -45,7 +45,7 @@ jobs:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
       - name: Docker configuration
         run:  |-
-          echo "$GCP_CREDENTIALS" | docker login -u _json_key --password-stdin https://eu-west4-docker.pkg.dev
+          echo "${{ secrets.GCP_CREDENTIALS }}" | docker login -u _json_key --password-stdin https://$GAR_LOCATION-docker.pkg.dev
       # Get the GKE credentials so we can deploy to the cluster
       - name: Set up GKE credentials
         uses: google-github-actions/get-gke-credentials@v0
@@ -55,7 +55,12 @@ jobs:
       # Build the Docker image
       - name: Build
         run: |-
-          docker build --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"  --build-arg GIT_SHA="$GITHUB_SHA"  --build-arg VERSION=${GITHUB_REF:-dev} --build-arg GOARCH=${GOARCH:-amd64} ./srv
+          docker build \
+            --tag "$GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" \
+            --build-arg GIT_SHA="$GITHUB_SHA" \
+            --build-arg VERSION=${GITHUB_REF:-dev} \
+            --build-arg GOARCH=${GOARCH:-amd64} \
+            ./srv
       # Push the Docker image to Google Artifact Registry
       - name: Publish
         run: |-
