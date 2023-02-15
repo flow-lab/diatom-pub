@@ -46,7 +46,7 @@ jobs:
 # login to docker using '${{ secrets.GCP_CREDENTIALS }}' as the password
       - name: Docker configuration
         run:  |-
-          echo ${{credentials_json}} | docker login -u oauth2accesstoken --password-stdin https://$GAR_LOCATION-docker.pkg.dev
+          echo ${credentials_json} | docker login -u oauth2accesstoken --password-stdin https://$GAR_LOCATION-docker.pkg.dev
         with:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 #      - name: Docker configuration
