@@ -18,9 +18,9 @@ on:
 
 env:
   DEPLOYMENT_NAME: diatom-pub
-  GAR_LOCATION: europe-west4
+  GAR_LOCATION: eu-west4
   GKE_CLUSTER: flow-platform-cluster
-  GKE_ZONE: europe-west4-a
+  GKE_ZONE: eu-west4-a
   IMAGE: diatom-pub
   PROJECT_ID: ${{secrets.GKE_PROJECT}}
   REPOSITORY: diatom-pub
