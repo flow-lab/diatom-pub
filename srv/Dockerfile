@@ -18,6 +18,7 @@ RUN GOOS=linux GOARCH=${GOARCH} go build -mod=readonly -ldflags="-w -s -X 'main.
 
 FROM golang:alpine3.16
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+RUN true
 COPY --from=builder /go/bin/app /go/bin/app
 
 RUN addgroup -S app && adduser -S -g -D -H app app
