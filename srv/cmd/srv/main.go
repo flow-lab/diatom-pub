@@ -163,6 +163,9 @@ func run(logger *log.Logger) error {
 		ctx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
 
+		// wait for timeout
+		time.Sleep(timeout)
+
 		// Asking listener to shut down and load shed.
 		err := apiSrv.Shutdown(ctx)
 		if err != nil {

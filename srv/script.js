@@ -9,9 +9,15 @@ export default function () {
         console.error("ENDPOINT_URL is not set");
         return;
     }
+
     let res = http.get(ENDPOINT_URL);
-    if (res.status != 200) {
+    if (res && res.status != 200) {
         console.error(`Request failed with status code ${res.status}\nResponse body: ${res.body}`);
     }
+
+    if (res === null) {
+        console.log(`Got null response from ${ENDPOINT_URL}`);
+    }
+
     sleep(0.1);
 }
