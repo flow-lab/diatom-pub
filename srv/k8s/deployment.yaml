@@ -16,6 +16,7 @@ spec:
       labels:
         app: diatom-pub
     spec:
+      terminationGracePeriodSeconds: 70
       containers:
         - name: diatom-pub
           image: LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG
