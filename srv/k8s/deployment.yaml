@@ -27,7 +27,14 @@ spec:
               path: /api.yaml
               port: 8080
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              # TODO [grokrz]: This should be a /health endpoint
+              path: /api.yaml
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             requests:
               cpu: 100m

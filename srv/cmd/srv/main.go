@@ -151,16 +151,16 @@ func run(logger *log.Logger) error {
 
 	// listen to all signal from os
 	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSTOP)
 
 	select {
 	case err := <-serverErrors:
 		return err
 	case sig := <-shutdown:
 		// got a timeout signal, let wait a bit before shutting downs the server
-		time.Sleep(1 * time.Second)
+		time.Sleep(15 * time.Second)
 
-		timeout := 15 * time.Second
+		timeout := 10 * time.Second
 		logger.Printf("got %v. Start graceful shutdown with timeout %s", sig, timeout)
 		ctx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
