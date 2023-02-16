@@ -41,7 +41,7 @@ jobs:
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
-          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+          credentials_json: '$(cat ${{ secrets.GCP_CREDS_B64 }} | base64 --decode)'
       - name: Docker configuration
         run:  |-
           echo ${{ secrets.GCP_CREDS_B64 }} | base64 --decode | docker login -u _json_key --password-stdin https://$GAR_LOCATION-docker.pkg.dev
