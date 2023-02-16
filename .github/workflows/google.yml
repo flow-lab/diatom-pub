@@ -24,7 +24,7 @@ env:
   IMAGE: ${{ github.event.repository.name }}
   PROJECT_ID: ${{secrets.GKE_PROJECT}}
   REPOSITORY: apps
-  GCP_CREDS_PATH: $HOME/credentials.json
+  GCP_CREDS_PATH: /tmp/credentials.json
 
 jobs:
   setup-build-publish-deploy:
