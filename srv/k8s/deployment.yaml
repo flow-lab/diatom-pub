@@ -51,3 +51,7 @@ spec:
               value: "redis"
             - name: REDIS_PORT
               value: "6379"
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "/bin/sh", "-c", "sleep 40" ]
