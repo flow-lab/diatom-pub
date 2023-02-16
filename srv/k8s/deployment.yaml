@@ -16,7 +16,6 @@ spec:
       labels:
         app: diatom-pub
     spec:
-      terminationGracePeriodSeconds: 70
       containers:
         - name: diatom-pub
           image: LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG
@@ -51,7 +50,3 @@ spec:
               value: "redis"
             - name: REDIS_PORT
               value: "6379"
-          lifecycle:
-            preStop:
-              exec:
-                command: [ "/bin/sh", "-c", "sleep 40" ]
