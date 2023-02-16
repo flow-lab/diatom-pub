@@ -39,7 +39,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Decode GCP credentials
-        run: GCP_CREDENTIALS=$(echo ${{ secrets.GCP_CREDS_B64 }} | base64 --decode) > gcp-creds.json
+        run: echo ${{ secrets.GCP_CREDS_B64 }} | base64 --decode > gcp-creds.json
       - id: 'auth'
         uses: 'google-github-actions/auth@v0'
         with:
