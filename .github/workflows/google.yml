@@ -24,7 +24,6 @@ env:
   IMAGE: ${{ github.event.repository.name }}
   PROJECT_ID: ${{secrets.GKE_PROJECT}}
   REPOSITORY: apps
-  GCP_CREDS_PATH: /tmp/credentials.json
 
 jobs:
   setup-build-publish-deploy:
@@ -39,14 +38,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Get the GCP credentials
-        run: |-
-          echo ${{ secrets.GCP_CREDS_B64 }} | base64 --decode > $GCP_CREDS_PATH
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
-#          credentials_json: '$(cat ${{ secrets.GCP_CREDS_B64 }} | base64 --decode)'
-          credentials_file_path: '${{ env.GCP_CREDS_PATH }}'
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
       - name: Docker configuration
         run:  |-
           echo ${{ secrets.GCP_CREDS_B64 }} | base64 --decode | docker login -u _json_key --password-stdin https://$GAR_LOCATION-docker.pkg.dev
