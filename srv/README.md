@@ -67,8 +67,8 @@ with interactive GUI `go tool pprof -http=:8080 heap.out`
 
 ```shell
 # for testing full no downtime deployment
-export ENDPOINT=https://1.2.3.4
-while true; do echo "$(date) - $(curl -s -o /dev/null -w "%{http_code}\n" ${ENDPOINT}/api.yaml)"; sleep 0.1; done
+export ENDPONT_URL=https://1.2.3.4/apud
+k6 run --vus 1 --duration 180s script.js
 ```
 
 ### Links
