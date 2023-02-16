@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app
+  name: diatom-pub
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app
+      app: diatom-pub
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -15,10 +15,10 @@ spec:
   template:
     metadata:
       labels:
-        app: app
+        app: diatom-pub
     spec:
       containers:
-        - name: app
+        - name: diatom-pub
           image: LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG
           ports:
             - containerPort: 8080
@@ -27,3 +27,20 @@ spec:
               cpu: 100m
             limits:
               cpu: 100m
+          env:
+            - name: PORT
+              value: "8080"
+            - name: DB_HOST
+              value: "db"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "diatom"
+            - name: DB_USERNAME
+              value: "diatom-pub"
+            - name: DB_PASSWORD
+              value: "diatom-pub"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
