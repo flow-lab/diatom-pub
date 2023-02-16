@@ -27,7 +27,7 @@ spec:
               path: /api.yaml
               port: 8080
             initialDelaySeconds: 5
-            periodSeconds: 5
+            periodSeconds: 10
           resources:
             requests:
               cpu: 100m

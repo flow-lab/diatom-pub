@@ -13,5 +13,5 @@ export default function () {
     if (res.status != 200) {
         console.error(`Request failed with status code ${res.status}\nResponse body: ${res.body}`);
     }
-    sleep(0.3);
+    sleep(0.1);
 }
