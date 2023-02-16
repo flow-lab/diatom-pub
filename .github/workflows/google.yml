@@ -38,15 +38,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Decode GCP credentials and decode it to a file
-        env:
-          GCP_CREDS_B64: ${{ secrets.GCP_CREDS_B64 }}
-        run: |
-          echo $GCP_CREDS_B64 | base64 --decode > credentials.json
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
-          credentials_json: $(cat credentials.json)
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
       - name: Docker configuration
         run:  |-
           echo ${{ secrets.GCP_CREDS_B64 }} | base64 --decode | docker login -u _json_key --password-stdin https://$GAR_LOCATION-docker.pkg.dev
