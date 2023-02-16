@@ -6,5 +6,6 @@ spec:
   targetRef:
     kind: Deployment
     name: diatom-pub
+    apiVersion: apps/v1
   updatePolicy:
     updateMode: Auto
