@@ -22,7 +22,7 @@ env:
   GKE_CLUSTER: flow-platform-cluster
   GKE_ZONE: europe-west4-a
   IMAGE: ${{ github.event.repository.name }}
-  PROJECT_ID: ${{secrets.GKE_PROJECT}}
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   REPOSITORY: apps
 
 jobs:
