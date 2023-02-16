@@ -9,9 +9,8 @@ spec:
       app: diatom-pub
   strategy:
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-  minReadySeconds: 5
+      maxSurge: 25%
+      maxUnavailable: 25%
   template:
     metadata:
       labels:
@@ -22,6 +21,13 @@ spec:
           image: LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              # TODO [grokrz]: This should be a /health endpoint
+              path: /api.yaml
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             requests:
               cpu: 100m

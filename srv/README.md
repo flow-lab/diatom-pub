@@ -62,6 +62,15 @@ where:
 To use memory profiler use `curl -sK -v http://localhost:8080/debug/pprof/heap > heap.out` and `go tool pprof heap.out` or 
 with interactive GUI `go tool pprof -http=:8080 heap.out`
 
+
+### NOTES
+
+```shell
+# for testing full no downtime deployment
+export ENDPOINT=https://1.2.3.4
+while true; do echo "$(date) - $(curl -s -o /dev/null -w "%{http_code}\n" ${ENDPOINT}/api.yaml)"; sleep 0.1; done
+```
+
 ### Links
 
 - https://github.com/kyleconroy/sqlc
