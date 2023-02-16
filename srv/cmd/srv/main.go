@@ -157,14 +157,13 @@ func run(logger *log.Logger) error {
 	case err := <-serverErrors:
 		return err
 	case sig := <-shutdown:
-		timeout := 5 * time.Second
-		logger.Printf("got %v. Start graceful shutdown with timeout %s", sig, timeout)
+		// got a timeout signal, let wait a bit before shutting downs the server
+		time.Sleep(1 * time.Second)
 
+		timeout := 15 * time.Second
+		logger.Printf("got %v. Start graceful shutdown with timeout %s", sig, timeout)
 		ctx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
-
-		// give it a bit of time...
-		time.Sleep(timeout)
 
 		// Asking listener to shut down and load shed.
 		err := apiSrv.Shutdown(ctx)
