@@ -1,6 +1,6 @@
-# diatom
+# diatom [![Build and Deploy to GKE](https://github.com/flow-lab/diatom-pub/actions/workflows/google.yml/badge.svg)](https://github.com/flow-lab/diatom-pub/actions/workflows/google.yml)
 
-Diatom test
+POC srv
 
 ```shell
 # generate db certs
