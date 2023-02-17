@@ -46,7 +46,7 @@ jobs:
 
       - name: Docker configuration
         run:  |-
-          echo '${{ secrets.GCP_CREDENTIALS }}' | docker login -u _json_key --password-stdin https://$GAR_LOCATION-docker.pkg.dev
+          echo '${{ secrets.GCP_CREDENTIALS }}' | jq -r tostring | docker login -u _json_key --password-stdin https://$GAR_LOCATION-docker.pkg.dev
 
       # Get the GKE credentials so we can deploy to the cluster
       - name: Set up GKE credentials
