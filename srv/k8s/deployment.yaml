@@ -16,6 +16,10 @@ spec:
       labels:
         app: diatom-pub
     spec:
+      volumes:
+        - name: client-cert
+          secret:
+            secretName: db-tls-secret
       containers:
         - name: diatom-pub
           image: LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG
@@ -47,6 +51,10 @@ spec:
                 name: db-config
             - secretRef:
                 name: db-secret
+          volumeMounts:
+            - mountPath: /etc/client-cert
+              name: client-cert
+              readOnly: true
           lifecycle:
             preStop:
               exec:

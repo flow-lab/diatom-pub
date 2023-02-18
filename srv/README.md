@@ -71,7 +71,7 @@ export ENDPONT_URL=https://1.2.3.4/apud
 k6 run --vus 1 --duration 180s script.js
 
 # db client certs
-psql "sslmode=verify-ca sslrootcert=server-ca.pem sslcert=client-cert.pem sslkey=client-key.pem hostaddr=34.90.132.101 port=5432 user=postgres dbname=postgres"
+psql "sslmode=verify-ca sslrootcert=server-ca.pem sslcert=client-cert.pem sslkey=client-key.pem hostaddr=34.90.132.101 port=5432 user=postgres dbname=postgres""sslmode=verify-ca sslrootcert=server-ca.pem sslcert=client-cert.pem sslkey=client-key.pem hostaddr=34.90.132.101 port=5432 user=postgres dbname=postgres"
 ```
 
 ### Links
