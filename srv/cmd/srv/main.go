@@ -133,10 +133,6 @@ func run(logger *log.Logger) error {
 	case err := <-serverErrors:
 		return err
 	case sig := <-shutdown:
-		// got a timeout signal, let wait a bit before shutting downs the server
-		// TODO [grokrz]: move it to the k8
-		time.Sleep(15 * time.Second)
-
 		timeout := 10 * time.Second
 		logger.Printf("got %v. Start graceful shutdown with timeout %s", sig, timeout)
 		ctx, cancel := context.WithTimeout(ctx, timeout)

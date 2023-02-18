@@ -24,14 +24,14 @@ spec:
           readinessProbe:
             httpGet:
               # TODO [grokrz]: This should be a /health endpoint
-              path: /api.yaml
+              path: /health
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
           livenessProbe:
             httpGet:
               # TODO [grokrz]: This should be a /health endpoint
-              path: /api.yaml
+              path: /health
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -40,20 +40,10 @@ spec:
               cpu: 100m
             limits:
               cpu: 100m
-          env:
-            - name: PORT
-              value: "8080"
-            - name: DB_HOST
-              value: "db"
-            - name: DB_PORT
-              value: "5432"
-            - name: DB_NAME
-              value: "diatom"
-            - name: DB_USERNAME
-              value: "diatom-pub"
-            - name: DB_PASSWORD
-              value: "diatom-pub"
-            - name: REDIS_HOST
-              value: "redis"
-            - name: REDIS_PORT
-              value: "6379"
+          envFrom:
+            - configMapRef:
+                name: diatom-pub
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 15"]
