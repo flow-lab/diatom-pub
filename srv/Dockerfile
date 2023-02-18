@@ -1,4 +1,4 @@
-FROM golang:alpine3.16 as builder
+FROM golang:alpine3.17 as builder
 
 RUN apk update && apk upgrade && \
     apk add --no-cache bash openssh musl-dev make pkgconfig
@@ -16,7 +16,7 @@ ARG GOARCH
 RUN make test
 RUN GOOS=linux GOARCH=${GOARCH} go build -mod=readonly -ldflags="-w -s -X 'main.version=${VERSION}' -X 'main.commit=${GIT_SHA}' -X 'main.date=$(date)'" -o /go/bin/app ./cmd/srv/
 
-FROM golang:alpine3.16
+FROM golang:alpine3.17
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 RUN true
 COPY --from=builder /go/bin/app /go/bin/app
