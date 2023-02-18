@@ -42,7 +42,11 @@ spec:
               cpu: 100m
           envFrom:
             - configMapRef:
-                name: diatom-pub
+                name: diatom-pub-config
+            - configMapRef:
+                name: db-config
+            - secretRef:
+                name: db-secret
           lifecycle:
             preStop:
               exec:
