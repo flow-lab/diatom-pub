@@ -18,11 +18,12 @@ func Health(ctx context.Context, db *sql.DB, client *redis.Client, log *log.Logg
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		if err := client.Ping().Err(); err != nil {
-			log.Printf("cache : error : %v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		// FIXME [grokrz]: fix redis health check
+		//if err := client.Ping().Err(); err != nil {
+		//	log.Printf("cache : error : %v", err)
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	return
+		//}
 		w.WriteHeader(http.StatusOK)
 	}
 }

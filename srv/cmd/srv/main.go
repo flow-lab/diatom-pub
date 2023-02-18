@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"expvar"
 	"fmt"
 	"log"
@@ -63,8 +62,8 @@ func run(logger *log.Logger) error {
 	logger.Printf("gomaxprocs : %d", runtime.GOMAXPROCS(0))
 
 	logger.Println("api server : initializing ")
-	readTimeout := 60 * time.Second
-	writeTimeout := 60 * time.Second
+	readTimeout := 30 * time.Second
+	writeTimeout := 30 * time.Second
 	apiSrv := http.Server{
 		Addr:         ":" + port,
 		ReadTimeout:  readTimeout,
@@ -72,31 +71,8 @@ func run(logger *log.Logger) error {
 	}
 
 	// connect to db
-	dbHost, ok := os.LookupEnv("DB_HOST")
-	if !ok {
-		logger.Fatal(errors.New("missing required parameter DB_HOST"))
-	}
-	dbPort, ok := os.LookupEnv("DB_PORT")
-	if !ok {
-		logger.Fatal(errors.New("missing required parameter DB_PORT"))
-	}
-	dbName, ok := os.LookupEnv("DB_NAME")
-	if !ok {
-		logger.Fatal(errors.New("missing required parameter DB_NAME"))
-	}
-	dbUsername, ok := os.LookupEnv("DB_USERNAME")
-	if !ok {
-		logger.Fatal(errors.New("missing required parameter DB_USERNAME"))
-	}
-	dbPassword, ok := os.LookupEnv("DB_PASSWORD")
-	if !ok {
-		logger.Fatal(errors.New("missing required parameter DB_PASSWORD"))
-	}
 
-	dbSSLMode := os.Getenv("DB_SSLMODE")
-
-	// connect to db
-	dbClient, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", dbHost, dbPort, dbName, dbUsername, dbPassword, dbSSLMode))
+	dbClient, err := db.ConnectTCPSocket()
 	if err != nil {
 		logger.Fatal(errors.Wrap(err, "sql.Open"))
 	}
@@ -158,6 +134,7 @@ func run(logger *log.Logger) error {
 		return err
 	case sig := <-shutdown:
 		// got a timeout signal, let wait a bit before shutting downs the server
+		// TODO [grokrz]: move it to the k8
 		time.Sleep(15 * time.Second)
 
 		timeout := 10 * time.Second

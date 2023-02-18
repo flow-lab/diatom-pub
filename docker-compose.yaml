@@ -116,10 +116,9 @@ services:
       PORT: ${PORT:-8000}
       DB_HOST: ${DB_HOST:-db}
       DB_NAME: ${DB_NAME:-diatom-dev}
-      DB_USERNAME: ${DB_USERNAME:-diatom-dev}
-      DB_PASSWORD: ${DB_PASSWORD:-diatom-dev}
+      DB_USER: ${DB_USERNAME:-diatom-dev}
+      DB_PASS: ${DB_PASSWORD:-diatom-dev}
       DB_PORT: ${DB_PORT:-5432}
-      DB_SSLMODE: ${DB_SSLMODE:-require}
       REDIS_HOST: ${REDIS_HOST:-redis}
       REDIS_PORT: ${REDIS_PORT:-6379}
     logging:
