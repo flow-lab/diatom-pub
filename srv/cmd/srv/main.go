@@ -49,7 +49,7 @@ func run(logger *log.Logger) error {
 	}()
 
 	var (
-		port        = utils.MustGetEnv("TEMPLATE_DIR")
+		port        = utils.MustGetEnv("PORT")
 		templateDir = utils.EnvOrDefault("TEMPLATE_DIR", "template/").(string)
 	)
 
