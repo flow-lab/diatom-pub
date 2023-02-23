@@ -51,7 +51,7 @@ func run(logger *logrus.Entry) error {
 	// catch the panic
 	defer func() {
 		if r := recover(); r != nil {
-			logger.Printf("panic : %s", r)
+			logger.Errorf("panic : %s", r)
 		}
 	}()
 
@@ -64,8 +64,8 @@ func run(logger *logrus.Entry) error {
 	// buffered channel so the goroutine can exit if we don't collect this error.
 	serverErrors := make(chan error, 1)
 
-	logger.Printf("gomaxprocs : %d", runtime.GOMAXPROCS(0))
-	logger.Println("api server : initializing ")
+	logger.Infof("gomaxprocs %d", runtime.GOMAXPROCS(0))
+	logger.Infof("api server initializing...")
 	readTimeout := 30 * time.Second
 	writeTimeout := 30 * time.Second
 	apiSrv := http.Server{
@@ -81,7 +81,7 @@ func run(logger *logrus.Entry) error {
 	}
 
 	// print db stats
-	logger.Printf("db stats : %+v", dbClient.Stats())
+	logger.Infof("db stats : %+v", dbClient.Stats())
 
 	// queries
 	queries := db.New(dbClient)
@@ -92,13 +92,13 @@ func run(logger *logrus.Entry) error {
 	}
 
 	// print redis stats
-	logger.Printf("redis stats : %+v", redisClient.PoolStats())
+	logger.Infof("redis stats : %+v", redisClient.PoolStats())
 
 	ctx := context.Background()
 
 	// start api server
 	go func(ctx context.Context) {
-		logger.Printf("api server : listening on %s", apiSrv.Addr)
+		logger.Infof("api server : listening on %s", apiSrv.Addr)
 		http.HandleFunc("/health", middleware.Chain(
 			Health(ctx, dbClient, redisClient, logger),
 			middleware.OnlyMethod("GET")),
