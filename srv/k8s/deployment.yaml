@@ -31,6 +31,10 @@ spec:
           volumeMounts:
             - name: db-sql-volume
               mountPath: /db
+              readOnly: true
+            - mountPath: /etc/client-cert
+              name: client-cert
+              readOnly: true
           envFrom:
             - configMapRef:
                 name: diatom-pub-flowdber-config
