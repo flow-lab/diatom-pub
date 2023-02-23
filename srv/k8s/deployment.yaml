@@ -33,7 +33,7 @@ spec:
               mountPath: /db
           envFrom:
             - configMapRef:
-                name: diatom-pub-config
+                name: diatom-pub-flowdber-config
             - configMapRef:
                 name: db-config
             - secretRef:
