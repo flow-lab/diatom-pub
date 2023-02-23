@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"github.com/flow-lab/diatom-pub/internal/helper"
+	utils "github.com/flow-lab/utils"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"os"
 )
@@ -12,11 +12,11 @@ import (
 // instance of Postgres.
 func ConnectTCPSocket() (*sql.DB, error) {
 	var (
-		dbUser    = helper.MustGetEnv("DB_USER") // e.g. 'my-db-user'
-		dbPwd     = helper.MustGetEnv("DB_PASS") // e.g. 'my-db-password'
-		dbTCPHost = helper.MustGetEnv("DB_HOST") // e.g. '127.0.0.1' ('172.17.0.1' if deployed to GAE Flex)
-		dbPort    = helper.MustGetEnv("DB_PORT") // e.g. '5432'
-		dbName    = helper.MustGetEnv("DB_NAME") // e.g. 'my-database'
+		dbUser    = utils.MustGetEnv("DB_USER") // e.g. 'my-db-user'
+		dbPwd     = utils.MustGetEnv("DB_PASS") // e.g. 'my-db-password'
+		dbTCPHost = utils.MustGetEnv("DB_HOST") // e.g. '127.0.0.1' ('172.17.0.1' if deployed to GAE Flex)
+		dbPort    = utils.MustGetEnv("DB_PORT") // e.g. '5432'
+		dbName    = utils.MustGetEnv("DB_NAME") // e.g. 'my-database'
 	)
 
 	dbURI := fmt.Sprintf("host=%s user=%s password=%s port=%s database=%s",

@@ -2,15 +2,15 @@ package cache
 
 import (
 	"fmt"
-	"github.com/flow-lab/diatom-pub/internal/helper"
+	utils "github.com/flow-lab/utils"
 	"github.com/go-redis/redis/v7"
 )
 
 // NewClient returns a new redis client.
 func NewClient() (*redis.Client, error) {
 	var (
-		redisHost = helper.MustGetEnv("REDIS_HOST")
-		redisPort = helper.MustGetEnv("REDIS_PORT")
+		redisHost = utils.MustGetEnv("REDIS_HOST")
+		redisPort = utils.MustGetEnv("REDIS_PORT")
 	)
 
 	client := redis.NewClient(&redis.Options{

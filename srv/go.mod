@@ -5,6 +5,7 @@ go 1.20
 require (
 	cloud.google.com/go/redis v1.11.0
 	github.com/alicebob/miniredis/v2 v2.30.0
+	github.com/flow-lab/utils v0.1.3
 	github.com/go-pg/pg v8.0.7+incompatible
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/google/uuid v1.3.0
@@ -12,7 +13,7 @@ require (
 	github.com/lib/pq v1.10.7
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
-	google.golang.org/genproto v0.0.0-20230216225411-c8e22ba71e44
+	google.golang.org/genproto v0.0.0-20230222225845-10f96fb3dbec
 )
 
 require (

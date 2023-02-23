@@ -20,6 +20,25 @@ spec:
         - name: client-cert
           secret:
             secretName: db-tls-secret
+        - name: db-sql-volume
+          # FIXME:
+          emptyDir: {}
+
+      initContainers:
+        - name: flowdber
+          image: flowlab/flowdber:0.3.6
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: db-sql-volume
+              mountPath: /db
+          envFrom:
+            - configMapRef:
+                name: diatom-pub-config
+            - configMapRef:
+                name: db-config
+            - secretRef:
+                name: db-pass-secret
+
       containers:
         - name: diatom-pub
           image: LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY/IMAGE:TAG

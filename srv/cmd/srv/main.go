@@ -5,7 +5,6 @@ import (
 	"expvar"
 	"fmt"
 	"github.com/flow-lab/diatom-pub/internal/cache"
-	"github.com/flow-lab/diatom-pub/internal/helper"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -18,6 +17,7 @@ import (
 	"github.com/flow-lab/diatom-pub/internal/db"
 	"github.com/flow-lab/diatom-pub/internal/handler"
 	"github.com/flow-lab/diatom-pub/internal/middleware"
+	utils "github.com/flow-lab/utils"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 )
@@ -29,7 +29,7 @@ var (
 )
 
 func main() {
-	logger := log.New(os.Stdout, fmt.Sprintf("diatom-pub : (%s, %s) : ", version, helper.Short(commit)), log.LstdFlags|log.Lmicroseconds|log.Lshortfile|log.Ldate)
+	logger := log.New(os.Stdout, fmt.Sprintf("diatom-pub : (%s, %s) : ", version, utils.Short(commit)), log.LstdFlags|log.Lmicroseconds|log.Lshortfile|log.Ldate)
 	if err := run(logger); err != nil {
 		logger.Printf("error : %s", err)
 		os.Exit(1)
@@ -41,9 +41,16 @@ func run(logger *log.Logger) error {
 	expvar.NewString("commit").Set(commit)
 	expvar.NewString("date").Set(date)
 
+	// catch the panic
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Printf("panic : %s", r)
+		}
+	}()
+
 	var (
-		port        = helper.MustGetEnv("PORT")
-		templateDir = helper.GetEnvOrDefault("TEMPLATE_DIR", "template/")
+		port        = utils.MustGetEnv("TEMPLATE_DIR")
+		templateDir = utils.EnvOrDefault("TEMPLATE_DIR", "template/").(string)
 	)
 
 	// Make a channel to listen for errors coming from the listener. Use a
