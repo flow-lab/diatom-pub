@@ -22,7 +22,8 @@ spec:
             secretName: db-tls-secret
         - name: db-sql-volume
           # FIXME:
-          emptyDir: {}
+          configMap:
+            name: diatom-pub-sql-files
 
       initContainers:
         - name: flowdber
