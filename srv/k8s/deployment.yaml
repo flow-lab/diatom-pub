@@ -21,7 +21,6 @@ spec:
           secret:
             secretName: db-tls-secret
         - name: db-sql-volume
-          # FIXME:
           configMap:
             name: diatom-pub-sql-files
 
