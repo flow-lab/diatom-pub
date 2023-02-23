@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 
@@ -12,17 +12,18 @@ import (
 
 // Health checks health status of this application. Will run check against db and cache, if
 // everything looks ok then it will return 200 code, 500 otherwise.
-func Health(ctx context.Context, db *sql.DB, client *redis.Client, log *log.Logger) func(w http.ResponseWriter, _ *http.Request) {
+func Health(ctx context.Context, db *sql.DB, client *redis.Client, logger *logrus.Entry) func(w http.ResponseWriter, _ *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx, _ := context.WithTimeout(ctx, 5*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		defer cancel()
 		if err := db.PingContext(ctx); err != nil {
-			log.Printf("db : error : %v", err)
+			logger.Errorf("db.PingContext %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		// FIXME [grokrz]: fix redis health check
 		//if err := client.Ping().Err(); err != nil {
-		//	log.Printf("cache : error : %v", err)
+		//	logger.Printf("cache : error : %v", err)
 		//	w.WriteHeader(http.StatusInternalServerError)
 		//	return
 		//}

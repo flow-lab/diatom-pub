@@ -1,11 +1,10 @@
 package middleware
 
 import (
+	"github.com/flow-lab/dlog"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
 
@@ -17,7 +16,10 @@ func TestLogging(t *testing.T) {
 	}
 
 	rec := httptest.NewRecorder()
-	l := log.New(os.Stdout, "", 0)
+	l := dlog.NewLogger(&dlog.Config{
+		AppName: "test",
+		Version: "test",
+	})
 	h := Chain(func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte("ok"))
 	}, Logging(l))

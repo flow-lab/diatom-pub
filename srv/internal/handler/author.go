@@ -5,15 +5,15 @@ import (
 	api "github.com/flow-lab/diatom-pub/internal/apimodel"
 	"github.com/flow-lab/diatom-pub/internal/db"
 	"github.com/google/uuid"
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
 // GetAuthor serves GET /authors/:id
-func GetAuthor(log *log.Logger, queries *db.Queries) func(w http.ResponseWriter, _ *http.Request) {
+func GetAuthor(logger *logrus.Entry, queries *db.Queries) func(w http.ResponseWriter, _ *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := r.URL.Path[len("/authors/"):]
-		log.Printf("id : %s", id)
+		logger.Infof("id %s", id)
 
 		authorID, err := uuid.Parse(id)
 		if err != nil {
@@ -27,7 +27,7 @@ func GetAuthor(log *log.Logger, queries *db.Queries) func(w http.ResponseWriter,
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
-			log.Printf("GetAuthor error : %s", err)
+			logger.Errorf("GetAuthor error %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -41,13 +41,13 @@ func GetAuthor(log *log.Logger, queries *db.Queries) func(w http.ResponseWriter,
 		w.WriteHeader(http.StatusOK)
 		json, err := authorAPI.MarshalJSON()
 		if err != nil {
-			log.Printf("error : %s", err)
+			logger.Errorf("authorAPI.MarshalJSON %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		_, err = w.Write(json)
 		if err != nil {
-			log.Printf("w.Write error : %s", err)
+			logger.Printf("w.Write %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}

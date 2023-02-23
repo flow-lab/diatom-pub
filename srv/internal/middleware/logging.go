@@ -1,19 +1,19 @@
 package middleware
 
 import (
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
 
 // Logging logs all requests with its path and the processing time
-func Logging(log *log.Logger) Middleware {
+func Logging(logger *logrus.Entry) Middleware {
 	return func(f http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
 			rr := resWriterWrapper(w)
 			defer func(rr *res) {
-				log.Println(r.URL.Path, rr.Status(), time.Since(start))
+				logger.Debugf(r.URL.Path, rr.Status(), time.Since(start))
 			}(rr)
 			f(rr, r)
 		}

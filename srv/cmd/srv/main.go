@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"expvar"
-	"fmt"
 	"github.com/flow-lab/diatom-pub/internal/cache"
-	"log"
+	"github.com/flow-lab/dlog"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -29,14 +29,21 @@ var (
 )
 
 func main() {
-	logger := log.New(os.Stdout, fmt.Sprintf("diatom-pub : (%s, %s) : ", version, utils.Short(commit)), log.LstdFlags|log.Lmicroseconds|log.Lshortfile|log.Ldate)
+	logger := dlog.NewLogger(&dlog.Config{
+		AppName:      "diatom-pub",
+		Level:        utils.EnvOrDefault("LOG_LEVEL", "debug").(string),
+		Version:      version,
+		Commit:       utils.Short(commit),
+		Build:        date,
+		ReportCaller: true,
+	})
 	if err := run(logger); err != nil {
-		logger.Printf("error : %s", err)
+		logger.Errorf("run %s", err)
 		os.Exit(1)
 	}
 }
 
-func run(logger *log.Logger) error {
+func run(logger *logrus.Entry) error {
 	expvar.NewString("version").Set(version)
 	expvar.NewString("commit").Set(commit)
 	expvar.NewString("date").Set(date)
@@ -122,23 +129,23 @@ func run(logger *log.Logger) error {
 		return err
 	case sig := <-shutdown:
 		timeout := 10 * time.Second
-		logger.Printf("got %v. Start graceful shutdown with timeout %s", sig, timeout)
+		logger.Infof("got %v. Start graceful shutdown with timeout %s", sig, timeout)
 		ctx, cancel := context.WithTimeout(ctx, timeout)
 		defer cancel()
 
 		// Asking listener to shut down and load shed.
 		err := apiSrv.Shutdown(ctx)
 		if err != nil {
-			logger.Printf("graceful shutdown timeout in %v : %v", timeout, err)
+			logger.Infof("graceful shutdown timeout in %v : %v", timeout, err)
 			err = apiSrv.Close()
 		}
 
 		switch {
 		case sig == syscall.SIGSTOP:
-			logger.Printf("integrity error : %v", sig)
+			logger.Errorf("integrity error : %v", sig)
 			return errors.New("integrity issue caused shutdown")
 		case err != nil:
-			logger.Printf("error : %v", err)
+			logger.Errorf("error %v", err)
 			return err
 		}
 	}

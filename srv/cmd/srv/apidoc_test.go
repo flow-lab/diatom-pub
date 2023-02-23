@@ -1,11 +1,10 @@
 package main
 
 import (
+	"github.com/flow-lab/dlog"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 )
@@ -19,7 +18,10 @@ func TestAPIDefinition(t *testing.T) {
 
 		rec := httptest.NewRecorder()
 		var h http.HandlerFunc
-		h = APIDefinition("../../template/", log.New(os.Stdout, "", log.LstdFlags))
+		logger := dlog.NewLogger(&dlog.Config{
+			AppName: "test",
+		})
+		h = APIDefinition("../../template/", logger)
 		h.ServeHTTP(rec, req)
 
 		assert.Equal(t, http.StatusOK, rec.Code)
