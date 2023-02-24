@@ -47,7 +47,7 @@ func GetAuthor(logger *logrus.Entry, queries *db.Queries) func(w http.ResponseWr
 		}
 		_, err = w.Write(json)
 		if err != nil {
-			logger.Printf("w.Write %s", err)
+			logger.Errorf("w.Write %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
