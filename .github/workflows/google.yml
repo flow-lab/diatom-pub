@@ -20,7 +20,7 @@ env:
   DEPLOYMENT_NAME: ${{ github.event.repository.name }}
   GAR_LOCATION: europe-west4
   GKE_CLUSTER: flow-platform-cluster
-  GKE_ZONE: europe-west4-a
+  GKE_ZONE: europe-west4
   IMAGE: ${{ github.event.repository.name }}
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   REPOSITORY: apps
